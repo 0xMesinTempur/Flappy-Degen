@@ -45,7 +45,7 @@ export const APP_TAGS = ['game', 'arcade', 'skill-based', 'flappy', 'base', 'far
  * URL for the app's icon image.
  * Used in app store listings and UI elements.
  */
-export const APP_ICON_URL = `${APP_URL}/icon.png`;
+export const APP_ICON_URL = `${APP_URL}/flappydegen.png`;
 
 /**
  * URL for the app's Open Graph image.

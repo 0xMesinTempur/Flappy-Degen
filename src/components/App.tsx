@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMiniApp } from "@neynar/react";
+import { sdk } from '@farcaster/miniapp-sdk';
 import { Header } from "~/components/ui/Header";
 import { Footer } from "~/components/ui/Footer";
 import { HomeTab, ActionsTab, ContextTab, WalletTab } from "~/components/ui/tabs";
 import { USE_WALLET } from "~/lib/constants";
 import { useNeynarUser } from "../hooks/useNeynarUser";
+import { SplashScreen } from "./SplashScreen";
 
 // --- Types ---
 export enum Tab {
@@ -52,6 +54,9 @@ export interface AppProps {
 export default function App(
   { title }: AppProps = { title: "Neynar Starter Kit" }
 ) {
+  // --- State ---
+  const [showSplash, setShowSplash] = useState(true);
+
   // --- Hooks ---
   const {
     isSDKLoaded,
@@ -78,46 +83,77 @@ export default function App(
     }
   }, [isSDKLoaded, setInitialTab]);
 
-  // --- Early Returns ---
-  if (!isSDKLoaded) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="spinner h-8 w-8 mx-auto mb-4"></div>
-          <p>Loading SDK...</p>
-        </div>
-      </div>
-    );
-  }
+  /**
+   * Calls the Farcaster SDK ready() action when the SDK is loaded.
+   * 
+   * This effect ensures that the splash screen is hidden as soon as
+   * the interface is ready to be displayed. It should be called
+   * immediately after the interface is prepared to prevent jitter
+   * and content reflow.
+   */
+  useEffect(() => {
+    if (isSDKLoaded && !showSplash) {
+      sdk.actions.ready();
+    }
+  }, [isSDKLoaded, showSplash]);
+
+  // Handle splash screen completion
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    if (isSDKLoaded) {
+      sdk.actions.ready();
+    }
+  };
 
   // --- Render ---
   return (
-    <div
-      style={{
-        paddingTop: context?.client.safeAreaInsets?.top ?? 0,
-        paddingBottom: context?.client.safeAreaInsets?.bottom ?? 0,
-        paddingLeft: context?.client.safeAreaInsets?.left ?? 0,
-        paddingRight: context?.client.safeAreaInsets?.right ?? 0,
-      }}
-    >
-      {/* Header should be full width */}
-      <Header neynarUser={neynarUser} />
+    <>
+      {/* Splash Screen */}
+      <SplashScreen 
+        isVisible={showSplash} 
+        onComplete={handleSplashComplete} 
+      />
 
-      {/* Main content and footer should be centered */}
-      <div className="container py-2 pb-20">
-        {/* Main title */}
-        <h1 className="text-2xl font-bold text-center mb-4">{title}</h1>
+      {/* Main App Content */}
+      {!showSplash && (
+        <div
+          style={{
+            paddingTop: context?.client.safeAreaInsets?.top ?? 0,
+            paddingBottom: context?.client.safeAreaInsets?.bottom ?? 0,
+            paddingLeft: context?.client.safeAreaInsets?.left ?? 0,
+            paddingRight: context?.client.safeAreaInsets?.right ?? 0,
+          }}
+        >
+          {/* Header should be full width */}
+          <Header neynarUser={neynarUser} />
 
-        {/* Tab content rendering */}
-        {currentTab === Tab.Home && <HomeTab />}
-        {currentTab === Tab.Actions && <ActionsTab />}
-        {currentTab === Tab.Context && <ContextTab />}
-        {currentTab === Tab.Wallet && <WalletTab />}
+          {/* Main content and footer should be centered */}
+          <div className="container py-2 pb-20">
+            {/* Main title */}
+            <h1 className="text-2xl font-bold text-center mb-4">{title}</h1>
 
-        {/* Footer with navigation */}
-        <Footer activeTab={currentTab as Tab} setActiveTab={setActiveTab} showWallet={USE_WALLET} />
-      </div>
-    </div>
+            {/* Tab content rendering */}
+            {currentTab === Tab.Home && <HomeTab />}
+            {currentTab === Tab.Actions && <ActionsTab />}
+            {currentTab === Tab.Context && <ContextTab />}
+            {currentTab === Tab.Wallet && <WalletTab />}
+
+            {/* Footer with navigation */}
+            <Footer activeTab={currentTab as Tab} setActiveTab={setActiveTab} showWallet={USE_WALLET} />
+          </div>
+        </div>
+      )}
+
+      {/* Loading state when SDK is not loaded */}
+      {!isSDKLoaded && !showSplash && (
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <div className="spinner h-8 w-8 mx-auto mb-4"></div>
+            <p>Loading SDK...</p>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -1,0 +1,39 @@
+{
+  "miniapp": {
+    "version": "1",
+    "name": "Flappy Degen",
+    "iconUrl": "https://flappy-degen.vercel.app/flappydegen.png",
+    "homeUrl": "https://flappy-degen.vercel.app",
+    "splashImageUrl": "https://flappy-degen.vercel.app/splash.png",
+    "splashBackgroundColor": "#f7f7f7",
+    "subtitle": "Tap to fly, dodge pipes",
+    "description": "Flappy Degen, tap to fly, dodge the pipes and earn degen tokens. A fun arcade game with blockchain rewards.",
+    "screenshotUrls": [
+      "https://flappy-degen.vercel.app/screenshot1.png",
+      "https://flappy-degen.vercel.app/screenshot2.png",
+      "https://flappy-degen.vercel.app/screenshot3.png"
+    ],
+    "primaryCategory": "games",
+    "tags": [
+      "game",
+      "arcade",
+      "skill-based",
+      "flappy",
+      "base"
+    ],
+    "heroImageUrl": "https://flappy-degen.vercel.app/hero.png",
+    "tagline": "Tap to fly, dodge pipes",
+    "ogTitle": "Flappy Degen",
+    "ogDescription": "Flappy Degen, tap to fly, dodge the pipes and earn degen tokens.",
+    "ogImageUrl": "https://flappy-degen.vercel.app/og.png",
+    "requiredChains": [
+      "eip155:8453"
+    ],
+    "requiredCapabilities": [
+      "actions.signIn",
+      "wallet.getEthereumProvider",
+      "actions.ready"
+    ],
+    "noindex": false
+  }
+} 

@@ -1,118 +1,189 @@
-/**
- * DESIGN SYSTEM - DO NOT EDIT UNLESS NECESSARY
- * 
- * This file contains the centralized design system for the mini app.
- * These component classes establish the visual consistency across all components.
- * 
- * ⚠️  AI SHOULD NOT NORMALLY EDIT THIS FILE ⚠️
- * 
- * Instead of modifying these classes, AI should:
- * 1. Use existing component classes (e.g., .btn, .card, .input)
- * 2. Use Tailwind utilities for one-off styling
- * 3. Create new React components rather than new CSS classes
- * 4. Only edit this file for specific bug fixes or accessibility improvements
- * 
- * When AI needs to style something:
- * ✅ Good: <button className="btn btn-primary">Click me</button>
- * ✅ Good: <div className="bg-primary text-white px-4 py-2 rounded">Custom</div>
- * ❌ Bad: Adding new CSS classes here for component-specific styling
- * 
- * This design system is intentionally minimal to prevent bloat and maintain consistency.
- */
+/* src/app/globals.css */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #333;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-* {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+.game-container {
+  border: 2px solid #fff;
+  overflow: hidden;
+  position: relative;
+  background-image: url('/background.png');
+  background-size: contain;
+  background-position: center;
+  cursor: default; /* Ubah cursor default */
 }
 
-*::-webkit-scrollbar {
-  display: none;
+.flappy-title {
+  font-family: 'Press Start 2P', monospace, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
 }
 
-@layer base {
-  :root {
-    --radius: 0.5rem;
-  }
+.degen {
+  position: absolute;
+  z-index: 10;
 }
 
-@layer components {
-  /* Global container styles for consistent layout */
-  .container {
-    @apply mx-auto max-w-md px-4;
-  }
-  
-  .container-wide {
-    @apply mx-auto max-w-lg px-4;
-  }
-  
-  .container-narrow {
-    @apply mx-auto max-w-sm px-4;
-  }
+.pipe {
+  position: absolute;
+  background-color: #44ad48;
+  border: 2px solid #263227;
+  border-radius: 5px;
+  z-index: 5;
+  background: linear-gradient(90deg, #66BB6A 0%, #4CAF50 50%, #388E3C 100%);
+  box-shadow: 
+        inset 4px 0 8px rgba(255, 255, 255, 0.3),
+        inset -4px 0 8px rgba(0, 0, 0, 0.3),
+        2px 2px 8px rgba(0, 0, 0, 0.4);
+}
 
-  /* Global card styles */
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm;
-  }
-  
-  .card-primary {
-    @apply bg-primary/10 border-primary/20;
-  }
+.score-display {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 30px;
+  font-weight: 900;
+  color: #ffeb3b;
+  text-shadow: 0 0 5px #fbc02d, 0 0 10px #fbc02d;
+  z-index: 20;
+  -webkit-text-stroke: 2px black;
+  transition: color 0.3s ease;
+}
 
-  /* Global button styles */
-  .btn {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
-  }
-  
-  .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-dark focus:ring-primary;
-  }
-  
-  .btn-secondary {
-    @apply bg-secondary text-gray-900 hover:bg-gray-200 focus:ring-gray-500 dark:bg-secondary-dark dark:text-gray-100 dark:hover:bg-gray-600;
-  }
-  
-  .btn-outline {
-    @apply border border-gray-300 bg-transparent hover:bg-gray-50 focus:ring-gray-500 dark:border-gray-600 dark:hover:bg-gray-800;
-  }
+.score-display:hover {
+  color: #fff176;
+}
 
-  /* Global input styles */
-  .input {
-    @apply block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400;
-  }
+.menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 30;
+  animation: fadeIn 0.5s ease forwards;
+}
 
-  /* Global loading spinner */
-  .spinner {
-    @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary;
-  }
-  
-  .spinner-primary {
-    @apply animate-spin rounded-full border-2 border-white border-t-transparent;
-  }
+.menu-box {
+  background: linear-gradient(135deg, #9c8ede 0%, #a3bffa 100%);
+  border-radius: 20px;
+  padding: 20px;  
+  max-width: 240px;
+  min-width: 240px;
+  text-align: center;
+  color: #f0e9ff;
+  box-shadow: 0 8px 32px 0 rgba(38, 50, 56, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: 'Press Start 2P', sans-serif;
+  animation: slideUp 0.5s ease forwards;
+  transition: transform 0.3s ease;
+}
 
-  /* Global focus styles */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
-  }
+.menu-box h1 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #5a148a;
+  text-shadow: 1px 1px 3px #b39ddb;
+  letter-spacing: 0.5px;
+}
+
+.menu-box h2 {
+  margin: 8px 0 4px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a148c;
+  letter-spacing: 0.3px;
+}
+
+.menu-box h3 {
+  margin: 6px 0 20px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7b1fa2;
+  letter-spacing: 0.3px;
+}
+
+.score-info {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #9c27b0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a148c;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.score-info p {
+  margin: 10px 0 20px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6a1b9a;
+}
+
+.button-main {
+  background-color: #9c27b0;
+  color: white;
+  padding: 14px 30px;
+  border-radius: 12px;
+  border: 2px solid #6a1b9a;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(156, 39, 176, 0.6);
+}
+
+.button-main:hover {
+  background-color: #7b1fa2;
+  transform: scale(1.05);
+}
+
+.button-secondary {
+  background-color: #e1bee7;
+  color: #4a148c;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 2px solid #9c27b0;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 3px 6px rgba(156, 39, 176, 0.4);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background-color: #ce93d8;
+  transform: scale(1.05);
+}
+
+.button-secondary:disabled {
+  background-color: #f3e5f5;
+  color: #b39ddb;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

@@ -1,0 +1,28 @@
+{
+  "name": "Flappy Degen",
+  "short_name": "Flappy Degen",
+  "description": "Flappy Degen, tap to fly, dodge the pipes and earn degen tokens.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f7f7",
+  "theme_color": "#f7f7f7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "splash_pages": null,
+  "categories": ["games", "entertainment"],
+  "lang": "en",
+  "dir": "ltr"
+} 
