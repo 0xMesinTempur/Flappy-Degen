@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { APP_NAME, APP_SPLASH_BACKGROUND_COLOR } from '~/lib/constants';
+import Image from 'next/image';
 
 interface SplashScreenProps {
   isVisible: boolean;
@@ -34,9 +35,11 @@ export function SplashScreen({ isVisible, onComplete }: SplashScreenProps) {
       <div className="text-center">
         {/* Logo/Icon */}
         <div className="mb-6">
-          <img
+          <Image
             src="/flappydegen.png"
             alt="Flappy Degen"
+            width={96}
+            height={96}
             className="w-24 h-24 mx-auto animate-pulse"
             style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))' }}
           />
