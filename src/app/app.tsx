@@ -4,9 +4,16 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { sdk } from '@farcaster/miniapp-sdk'
-import ConnectMenu from '../components/ConnectMenu';
+import dynamic from 'next/dynamic';
 import { useAccount, useSendTransaction } from 'wagmi';
 import { parseEther } from 'viem';
+import Image from 'next/image';
+
+// Dynamic import untuk ConnectMenu
+const ConnectMenu = dynamic(
+  () => import('../components/ConnectMenu'),
+  { ssr: false }
+);
 
 // --- KONSTANTA GAME (Sama seperti sebelumnya) ---
 const GAME_WIDTH = 320;
@@ -27,6 +34,9 @@ const DEGEN_X_POSITION = 60;
 type GameState = 'MENU' | 'PLAYING' | 'GAME_OVER';
 
 const App = () => {
+  // Tambahkan state untuk mounting
+  const [isMounted, setIsMounted] = useState(false);
+
   // --- STATE MANAGEMENT BARU ---
   const [gameState, setGameState] = useState<GameState>('MENU');
   const [score, setScore] = useState(0);
@@ -46,7 +56,7 @@ const App = () => {
   const [donationAmount, setDonationAmount] = useState('');
 
   // Wagmi hooks
-  const { isConnected, address } = useAccount();
+  const { isConnected } = useAccount();
   const { sendTransaction, isPending } = useSendTransaction();
 
   useEffect(() => {
@@ -140,7 +150,7 @@ const App = () => {
           return;
         }
 
-        for (let pipe of pipes) {
+        for (const pipe of pipes) {
             const degenRight = DEGEN_X_POSITION + DEGEN_SIZE;
             const pipeRight = pipe.x + PIPE_WIDTH;
             if (degenRight > pipe.x && DEGEN_X_POSITION < pipeRight) {
@@ -190,23 +200,36 @@ const App = () => {
       });
       setShowDonationModal(false);
       alert('Thank you for your donation!');
-    } catch (error: any) {
-      console.error('Donation error:', error);
-      alert('Transaction failed: ' + (error.message || 'Please try again'));
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Donation error:', error);
+        alert('Transaction failed: ' + (error.message || 'Please try again'));
+      } else {
+        alert('Transaction failed: Please try again');
+      }
     }
   };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Jika belum mounted, return null atau loading placeholder
+  if (!isMounted) {
+    return null; // atau loading placeholder
+  }
 
   return (
     <div
       className="game-container"
-      onClick={gameState === 'PLAYING' ? jump : undefined} // Hanya bisa jump saat bermain
+      onClick={gameState === 'PLAYING' ? jump : undefined}
       style={{
         width: `${GAME_WIDTH}px`,
         height: `${GAME_HEIGHT}px`,
       }}
     >
-      {/* Tampilkan ConnectMenu hanya di menu utama */}
-      {gameState === 'MENU' && (
+      {/* Tampilkan ConnectMenu hanya jika sudah mounted */}
+      {isMounted && gameState === 'MENU' && (
         <div style={{
           position: 'absolute',
           top: 24,
@@ -224,11 +247,13 @@ const App = () => {
       {gameState === 'PLAYING' && <div className="score-display">{score}</div>}
       {(gameState === 'PLAYING' || gameState === 'GAME_OVER') && (
         <>
-          <img 
+          <Image 
             src="/flappydegen.png" 
             alt="Flappy Degen" 
             className="degen"
             style={{ top: `${degenPosition}px`, left: `${DEGEN_X_POSITION}px`, width: `${DEGEN_SIZE}px`, height: `${DEGEN_SIZE}px` }}
+            width={DEGEN_SIZE}
+            height={DEGEN_SIZE}
           />
           {pipes.map((pipe, index) => (
             <React.Fragment key={index}>
@@ -348,7 +373,7 @@ const App = () => {
         </div>
       )}
       {/* Modal Donasi */}
-      {showDonationModal && (
+      {isMounted && showDonationModal && (
         <div className="menu-overlay" onClick={() => setShowDonationModal(false)}>
           <div className="menu-box" onClick={e => e.stopPropagation()} style={{ padding: '20px', maxWidth: '300px' }}>
             <h2 style={{ marginBottom: '15px' }}>Support the Developer</h2>

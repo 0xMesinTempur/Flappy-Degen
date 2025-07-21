@@ -4,6 +4,8 @@ import { createServer } from 'net';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
+import nextDev from 'next/dist/cli/next-dev.js';
 
 // Load environment variables
 dotenv.config({ path: '.env.local' });
@@ -12,7 +14,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(path.normalize(path.join(__dirname, '..')));
 
 let tunnel;
-let nextDev;
 let isCleaningUp = false;
 
 // Parse command line arguments for port
@@ -147,66 +148,8 @@ async function startDev() {
   // Start next dev with appropriate configuration
   const nextBin = path.normalize(path.join(projectRoot, 'node_modules', '.bin', 'next'));
 
-  nextDev = spawn(nextBin, ['dev', '-p', port.toString()], {
-    stdio: 'inherit',
-    env: { ...process.env, NEXT_PUBLIC_URL: miniAppUrl, NEXTAUTH_URL: miniAppUrl },
-    cwd: projectRoot,
-    shell: process.platform === 'win32' // Add shell option for Windows
-  });
-
-  // Handle cleanup
-  const cleanup = async () => {
-    if (isCleaningUp) return;
-    isCleaningUp = true;
-
-    console.log('\n\nShutting down...');
-
-    try {
-      if (nextDev) {
-        try {
-          // Kill the main process first
-          nextDev.kill('SIGKILL');
-          // Then kill any remaining child processes in the group
-          if (nextDev?.pid) {
-            try {
-              process.kill(-nextDev.pid);
-            } catch (e) {
-              // Ignore ESRCH errors when killing process group
-              if (e.code !== 'ESRCH') throw e;
-            }
-          }
-          console.log('🛑 Next.js dev server stopped');
-        } catch (e) {
-          // Ignore errors when killing nextDev
-          console.log('Note: Next.js process already terminated');
-        }
-      }
-      
-      if (tunnel) {
-        try {
-          await tunnel.close();
-          console.log('🌐 Tunnel closed');
-        } catch (e) {
-          console.log('Note: Tunnel already closed');
-        }
-      }
-
-      // Force kill any remaining processes on the specified port
-      await killProcessOnPort(port);
-    } catch (error) {
-      console.error('Error during cleanup:', error);
-    } finally {
-      process.exit(0);
-    }
-  };
-
-  // Handle process termination
-  process.on('SIGINT', cleanup);
-  process.on('SIGTERM', cleanup);
-  process.on('exit', cleanup);
-  if (tunnel) {
-    tunnel.on('close', cleanup);
-  }
+  // Start Next.js dev server
+  await nextDev(['-p', port.toString()]);
 }
 
-startDev().catch(console.error); 
+startDev().catch(console.error);

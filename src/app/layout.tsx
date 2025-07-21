@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 
-import { getSession } from "~/auth"
 import "~/app/globals.css";
 import { Providers } from './providers';
 import { 
   APP_NAME, 
   APP_DESCRIPTION, 
   APP_ICON_URL, 
-  APP_SPLASH_URL, 
   APP_SPLASH_BACKGROUND_COLOR 
 } from "~/lib/constants";
 
